@@ -95,7 +95,7 @@ people_from_file (const char * filepath, const char * delimiter)
     Persona *persona;
     printf ("%s\n", line);
     persona = persona_from_string (line, delimiter);
-    t_array_append (persona, persona);
+    t_array_append (people, persona);
   }
   return people;
 }

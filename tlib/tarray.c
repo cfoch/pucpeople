@@ -28,7 +28,8 @@ t_array_foreach (TArray * array, TFunc func, tpointer user_data)
 void
 t_array_append (TArray * array, tpointer data)
 {
-  array->vector = realloc (array->vector, sizeof (tpointer) * array->len++);
+  array->len++;
+  array->vector = realloc (array->vector, sizeof (tpointer) * array->len);
   array->vector[array->len - 1] = data;  
 }
 
