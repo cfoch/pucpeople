@@ -159,7 +159,7 @@ void
 t_array_merge_sort_with_data (TArray * array, TCompDataFunc cmp_func,
     tpointer cmp_data)
 {
-  t_array_merge_sort_with_data (array, cmp_func, cmp_data);
+  _t_array_merge_sort_with_data (array, 0, array->len - 1, cmp_func, cmp_data);
 }
 
 void

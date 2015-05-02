@@ -43,6 +43,7 @@ people_cmp_with_priority (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
   TBoolean stop_me = FALSE;
   TArray *cmp_funcs;
 
+  printf ("HO\n");
   cmp_funcs = (TArray *) ptr_cmp_funcs;
   for (i = 0; i < t_array_length (cmp_funcs) && (!stop_me); i++) {
     TCompFunc cmp_func;
@@ -51,6 +52,7 @@ people_cmp_with_priority (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
     maybe_ret = cmp_func (a, b);
     stop_me = maybe_ret != 0;
   }
+  printf ("maybe_ret: %d\n", maybe_ret);
   return maybe_ret;
 }
 
@@ -61,11 +63,11 @@ persona_from_string (tchar * str, const char * delimiter)
   char * pch;
 
   persona = malloc (sizeof (Persona));
-  persona->first_name = strtok (str, delimiter);
-  persona->father_last_name = strtok (NULL, delimiter);
-  persona->mother_last_name = strtok (NULL, delimiter);
+  persona->first_name = strdup (strtok (str, delimiter));
+  persona->father_last_name = strdup (strtok (NULL, delimiter));
+  persona->mother_last_name = strdup (strtok (NULL, delimiter));
   persona->year = atoi (strtok (NULL, delimiter));
-  persona->city = strtok (NULL, delimiter);
+  persona->city = strdup (strtok (NULL, delimiter));
 
   return persona;
 }
@@ -75,6 +77,7 @@ persona_beautiful_print (tpointer persona, tpointer user_data)
 {
   printf ("%s\n", PERSONA (persona)->first_name);
   printf ("%s\n", PERSONA (persona)->father_last_name);
+  printf ("%s\n", PERSONA (persona)->mother_last_name);
   printf ("%d\n", PERSONA (persona)->year);
   printf ("%s\n", PERSONA (persona)->city);
   printf ("\n");
@@ -93,7 +96,6 @@ people_from_file (const char * filepath, const char * delimiter)
   f = fopen (filepath, "r");
   while (fscanf (f, " %[^\n]s", line) == 1) {
     Persona *persona;
-    printf ("%s\n", line);
     persona = persona_from_string (line, delimiter);
     t_array_append (people, persona);
   }
