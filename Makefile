@@ -1,6 +1,6 @@
 CFLAGS=-I./tlib -I./people/
 
-pucpeople:
+pucpeopple:
 	gcc -o main \
   tlib/*.c people/*.c \
 	main.c \

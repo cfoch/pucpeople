@@ -3,7 +3,7 @@
 
 #include "people.h"
 
-#define PERSONA(p)              ((Persona *) (p))
+#define PERSONA(p)                                ((Persona *) (p))
 
 int
 people_cmp_by_first_name (tpointer a, tpointer b)
@@ -43,7 +43,6 @@ people_cmp_with_priority (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
   TBoolean stop_me = FALSE;
   TArray *cmp_funcs;
 
-  printf ("HO\n");
   cmp_funcs = (TArray *) ptr_cmp_funcs;
   for (i = 0; i < t_array_length (cmp_funcs) && (!stop_me); i++) {
     TCompFunc cmp_func;
@@ -52,8 +51,13 @@ people_cmp_with_priority (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
     maybe_ret = cmp_func (a, b);
     stop_me = maybe_ret != 0;
   }
-  printf ("maybe_ret: %d\n", maybe_ret);
   return maybe_ret;
+}
+
+int
+people_cmp_with_priority_rev (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
+{
+  return -people_cmp_with_priority (a, b, ptr_cmp_funcs);
 }
 
 Persona *
@@ -94,10 +98,18 @@ people_from_file (const char * filepath, const char * delimiter)
   people = t_array_new ();
 
   f = fopen (filepath, "r");
+
+  if (!f)
+    goto file_not_found;
+
   while (fscanf (f, " %[^\n]s", line) == 1) {
     Persona *persona;
     persona = persona_from_string (line, delimiter);
     t_array_append (people, persona);
   }
   return people;
+
+file_not_found:
+  free (people);
+  return NULL;
 }
