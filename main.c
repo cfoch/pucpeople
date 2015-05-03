@@ -12,7 +12,7 @@ display_help ()
     "Options: \n"
 
     "\t--file (-f)"
-    "\t\t\t\t"
+    "\t\t\t\t\t"
     "A file path with the data separated by a delimiter"
     "\n"
 
@@ -70,7 +70,7 @@ main (int argc, char ** argv)
       case 'f':
         people = people_from_file (optarg, ",");
         if (!people)
-          goto file_not_found;
+          goto file_error;
         break;
       case 'p':
       {
@@ -137,8 +137,8 @@ error_no_args:
   display_help ();
   return FALSE;
 
-file_not_found:
+file_error:
   free (priority_cmp_funcs);
-  printf ("File was not found\n");
+  printf ("The file does not exist or it does not follow a format.\n");
   return FALSE;
 }

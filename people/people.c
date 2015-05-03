@@ -64,16 +64,27 @@ Persona *
 persona_from_string (tchar * str, const char * delimiter)
 {
   Persona *persona;
-  char * pch;
+  int i;
+  char *field[5];
+
+  for (i = 0; i < 5; i++) {
+    if (i == 0)
+      field[i] = strdup (strtok (str, delimiter));
+    else
+      field[i] = strtok (NULL, delimiter);
+    if (!field[i])
+      return NULL;
+    field[i] = strdup (field[i]);
+  }
 
   persona = malloc (sizeof (Persona));
-  persona->first_name = strdup (strtok (str, delimiter));
-  persona->father_last_name = strdup (strtok (NULL, delimiter));
-  persona->mother_last_name = strdup (strtok (NULL, delimiter));
-  persona->year = atoi (strtok (NULL, delimiter));
-  persona->city = strdup (strtok (NULL, delimiter));
+  persona->first_name = strdup (field[0]);
+  persona->father_last_name = strdup (field[1]);
+  persona->mother_last_name = strdup (field[2]);
+  persona->year = atoi (field[3]);
+  persona->city = strdup (field[4]);
 
-  return persona;
+  return persona;  
 }
 
 void
@@ -100,16 +111,23 @@ people_from_file (const char * filepath, const char * delimiter)
   f = fopen (filepath, "r");
 
   if (!f)
-    goto file_not_found;
+    goto handle_error;
 
   while (fscanf (f, " %[^\n]s", line) == 1) {
     Persona *persona;
     persona = persona_from_string (line, delimiter);
+    if (!persona)
+      goto handle_error;
     t_array_append (people, persona);
   }
+  fclose (f);
+
+  if (people->len == 0)
+    goto handle_error;
+
   return people;
 
-file_not_found:
+handle_error:
   free (people);
   return NULL;
 }
