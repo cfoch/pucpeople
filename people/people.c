@@ -61,11 +61,9 @@ persona_eq (tpointer pers1, tpointer target, tpointer crits)
       case PERSONA_YEAR:
         eq = eq && (p1->year == p2->year); /* eq = eq && ... */
         break;
-      case PERSONA_CITY: {
+      case PERSONA_CITY:
         eq = eq && (strcmp (p1->city, p2->city) == 0);
-        printf ("comparando %s vs --\n", p1->city);
         break;
-      }
     }
   }
   return eq;
@@ -110,6 +108,8 @@ persona_from_string (tchar * str, const char * delimiter)
       field[i] = strtok (NULL, delimiter);
     if (!field[i])
       return NULL;
+    if (i == 4)
+      field[i][strlen (field[i]) - 2] = '\0';
     field[i] = strdup (field[i]);
   }
 
@@ -149,9 +149,8 @@ people_from_file (const char * filepath, const char * delimiter)
   if (!f)
     goto handle_error;
 
-  while (fscanf (f, " %[^\n]s", line) == 1) {
+  while (fgets (line, 1000, f)) {
     Persona *persona;
-    printf ("[%s]\n", line);
     persona = persona_from_string (line, delimiter);
     if (!persona)
       goto handle_error;
