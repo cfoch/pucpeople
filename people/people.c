@@ -53,21 +53,19 @@ persona_eq (tpointer pers1, tpointer target, tpointer crits)
         eq = eq && (strcmp (p1->first_name, p2->first_name) == 0);
         break;
       case PERSONA_FATHER_LAST_NAME:
-      {
-        printf ("comparando apellido paterno\n");
         eq = eq && (strcmp (p1->father_last_name, p2->father_last_name) == 0);
-        printf ("comparando %d vs %d\n", p1->father_last_name, p2->father_last_name);
         break;
-      }
       case PERSONA_MOTHER_LAST_NAME:
         eq = eq && (strcmp (p1->mother_last_name, p2->mother_last_name) == 0);
         break;
       case PERSONA_YEAR:
         eq = eq && (p1->year == p2->year); /* eq = eq && ... */
         break;
-      case PERSONA_CITY:
+      case PERSONA_CITY: {
         eq = eq && (strcmp (p1->city, p2->city) == 0);
+        printf ("comparando %s vs --\n", p1->city);
         break;
+      }
     }
   }
   return eq;
@@ -153,6 +151,7 @@ people_from_file (const char * filepath, const char * delimiter)
 
   while (fscanf (f, " %[^\n]s", line) == 1) {
     Persona *persona;
+    printf ("[%s]\n", line);
     persona = persona_from_string (line, delimiter);
     if (!persona)
       goto handle_error;

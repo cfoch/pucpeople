@@ -168,7 +168,6 @@ main (int argc, char ** argv)
   if (!filter)
     t_array_foreach (people, persona_beautiful_print, NULL);
   else {
-    printf ("HOLA\n");
     filter_result = t_array_filter_with_data (people, p_cmp, persona_eq,
         priority_cmp_funcs);
     t_array_foreach (filter_result, persona_beautiful_print, NULL);
