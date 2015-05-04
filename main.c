@@ -42,7 +42,9 @@ main (int argc, char ** argv)
 {
   TArray *people;
   TArray *priority_cmp_funcs;
-  TBoolean asc;
+  TBoolean asc = TRUE, filter = FALSE;
+  TArray *filter_result;
+  Persona *p_cmp;
 
   priority_cmp_funcs = t_array_new ();
   asc = TRUE;
@@ -59,10 +61,16 @@ main (int argc, char ** argv)
       {"merge-sort", no_argument, NULL, 'm'},
       {"insertion-sort", no_argument, NULL, 'i'},
       {"priority", required_argument, NULL, 'p'},
+      {"filter", no_argument, NULL, 's'},
+      {"first-name", required_argument, NULL, 'n'},
+      {"father-last-name", required_argument, NULL, 'v'},
+      {"mother-last-name", required_argument, NULL, 'w'},
+      {"year", required_argument, NULL, 'y'},
+      {"city", required_argument, NULL, 'c'},
       {NULL, 0, NULL, 0}
     };
     int option_index = 0, c;
-    c = getopt_long (argc, argv, "f:hadmip:", long_options, &option_index);
+    c = getopt_long (argc, argv, "f:hadmip:sn:v:w:y:c:", long_options, &option_index);
     if (c == -1)
       break;
 
@@ -118,6 +126,36 @@ main (int argc, char ** argv)
           t_array_insertion_sort_with_data (people,
               people_cmp_with_priority_rev, priority_cmp_funcs);
         break;
+      case 's': /* filter */
+      {
+        p_cmp = malloc (sizeof (Persona));
+        priority_cmp_funcs = t_array_new ();
+        filter = TRUE;
+        break;
+      }
+      case 'n': /* first-name */
+        t_array_append (priority_cmp_funcs,
+            INT_TO_TPOINTER (PERSONA_FIRST_NAME));
+        p_cmp->first_name = strdup (optarg);
+        break;
+      case 'v': /* father-last-name*/
+        t_array_append (priority_cmp_funcs,
+          INT_TO_TPOINTER (PERSONA_FATHER_LAST_NAME));
+        p_cmp->father_last_name = strdup (optarg);
+        break;
+      case 'w': /* mother-last-name*/
+        t_array_append (priority_cmp_funcs,
+            INT_TO_TPOINTER (PERSONA_MOTHER_LAST_NAME));
+        p_cmp->mother_last_name = strdup (optarg);
+        break;
+      case 'y': /* year */
+        p_cmp->year = atoi (optarg);
+        t_array_append (priority_cmp_funcs, INT_TO_TPOINTER (PERSONA_YEAR));
+        break;
+      case 'c': /* city */
+        p_cmp->city = strdup (optarg);
+        t_array_append (priority_cmp_funcs, INT_TO_TPOINTER (PERSONA_CITY));
+        break;
       case 'h':
         display_help ();
         return TRUE;
@@ -127,8 +165,14 @@ main (int argc, char ** argv)
     }
   }
 
-  t_array_foreach (people, persona_beautiful_print, NULL);
-
+  if (!filter)
+    t_array_foreach (people, persona_beautiful_print, NULL);
+  else {
+    printf ("HOLA\n");
+    filter_result = t_array_filter_with_data (people, p_cmp, persona_eq,
+        priority_cmp_funcs);
+    t_array_foreach (filter_result, persona_beautiful_print, NULL);
+  }
 
   return TRUE;
 

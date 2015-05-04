@@ -15,6 +15,9 @@ typedef int  (*TCompFunc)       (tpointer a,
 typedef int  (*TCompDataFunc)   (tpointer a,
                                  tpointer b,
                                  tpointer user_data);
+typedef int  (*TEqDataFunc)     (tpointer a,
+                                 tpointer b,
+                                 tpointer user_data);
 
 #endif /* __T_TYPES_H__ */
 

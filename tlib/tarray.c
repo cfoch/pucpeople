@@ -45,7 +45,24 @@ t_array_length (TArray * array)
   return array->len;
 }
 
-static
+TArray *
+t_array_filter_with_data (TArray * array, tpointer target, TEqDataFunc eq_func,
+    tpointer user_data)
+{
+  int i;
+  TArray *ret;
+  ret = t_array_new ();
+
+  for (i = 0; i < t_array_length (array); i++) {
+    tpointer elem;
+    elem = t_array_index (array, i);
+    if (eq_func (elem, target, user_data))
+      t_array_append (ret, elem);
+  }
+  return ret;
+}
+
+static void
 _t_array_merge (TArray * array, int start_index, int middle_index,
     int end_index, TCompFunc cmp_func)
 {

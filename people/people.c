@@ -35,6 +35,44 @@ people_cmp_by_city (tpointer a, tpointer b)
   return strcmp (PERSONA (a)->city, PERSONA (b)->city);
 }
 
+TBoolean
+persona_eq (tpointer pers1, tpointer target, tpointer crits)
+{
+  Persona *p1, *p2;
+  TArray * criterias;
+  int i;
+  TBoolean eq = TRUE;
+
+  p1 = PERSONA (pers1);
+  p2 = PERSONA (target);
+  criterias = (TArray *) crits;
+
+  for (i = 0; i < t_array_length (criterias) && eq; i++) {
+    switch (TPOINTER_TO_INT (t_array_index (criterias, i))) {
+      case PERSONA_FIRST_NAME:
+        eq = eq && (strcmp (p1->first_name, p2->first_name) == 0);
+        break;
+      case PERSONA_FATHER_LAST_NAME:
+      {
+        printf ("comparando apellido paterno\n");
+        eq = eq && (strcmp (p1->father_last_name, p2->father_last_name) == 0);
+        printf ("comparando %d vs %d\n", p1->father_last_name, p2->father_last_name);
+        break;
+      }
+      case PERSONA_MOTHER_LAST_NAME:
+        eq = eq && (strcmp (p1->mother_last_name, p2->mother_last_name) == 0);
+        break;
+      case PERSONA_YEAR:
+        eq = eq && (p1->year == p2->year); /* eq = eq && ... */
+        break;
+      case PERSONA_CITY:
+        eq = eq && (strcmp (p1->city, p2->city) == 0);
+        break;
+    }
+  }
+  return eq;
+}
+
 int
 people_cmp_with_priority (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
 {

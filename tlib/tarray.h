@@ -6,7 +6,7 @@ struct _TArray
 {
   tpointer *vector;
   int len;
-  TFunc *free_func;
+  /* TFunc *free_func; */
 };
 
 typedef struct _TArray TArray;
@@ -22,5 +22,7 @@ void t_array_merge_sort_with_data (TArray * array, TCompDataFunc cmp_func,
     tpointer cmp_data);
 void t_array_insertion_sort_with_data (TArray * array, TCompDataFunc cmp_func,
     tpointer cmp_data);
+TArray * t_array_filter_with_data (TArray * array, tpointer target,
+    TEqDataFunc eq_func, tpointer user_data);
 
 #endif /* __T_ARRAY_H__ */
