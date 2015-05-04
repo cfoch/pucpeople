@@ -34,6 +34,10 @@ display_help ()
 
     "\t--priority (-p) [father-last-name | mother-last-name | city | year | first-name]"
     "\n"
+
+    "\t--filter (-s) [--father-last-name | --mother-last-name | --city | --year | --first-name] <value>"
+    "\n"
+
   );
 }
 
@@ -134,29 +138,41 @@ main (int argc, char ** argv)
         break;
       }
       case 'n': /* first-name */
+        if (!filter)
+          goto error_no_args;
         t_array_append (priority_cmp_funcs,
             INT_TO_TPOINTER (PERSONA_FIRST_NAME));
         p_cmp->first_name = strdup (optarg);
         break;
       case 'v': /* father-last-name*/
+        if (!filter)
+          goto error_no_args;
         t_array_append (priority_cmp_funcs,
           INT_TO_TPOINTER (PERSONA_FATHER_LAST_NAME));
         p_cmp->father_last_name = strdup (optarg);
         break;
       case 'w': /* mother-last-name*/
+        if (!filter)
+          goto error_no_args;
         t_array_append (priority_cmp_funcs,
             INT_TO_TPOINTER (PERSONA_MOTHER_LAST_NAME));
         p_cmp->mother_last_name = strdup (optarg);
         break;
       case 'y': /* year */
+        if (!filter)
+          goto error_no_args;
         p_cmp->year = atoi (optarg);
         t_array_append (priority_cmp_funcs, INT_TO_TPOINTER (PERSONA_YEAR));
         break;
       case 'c': /* city */
+        if (!filter)
+          goto error_no_args;
         p_cmp->city = strdup (optarg);
         t_array_append (priority_cmp_funcs, INT_TO_TPOINTER (PERSONA_CITY));
         break;
       case 'h':
+        if (!filter)
+          goto error_no_args;
         display_help ();
         return TRUE;
         break;
