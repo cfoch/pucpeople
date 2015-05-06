@@ -1,8 +1,17 @@
 #include <stdio.h>
 #include <getopt.h>
+#include <time.h>
+#include <stdint.h>
 
 #include "tlib.h"
 #include "people.h"
+
+void
+_print_time (clock_t t)
+{
+  /* printf ("Time: %ju \n", (uintmax_t) (clock_t) t); */
+  printf ("Time: %6.4f \n", (double) t / CLOCKS_PER_SEC);
+}
 
 void
 display_help ()
@@ -49,6 +58,7 @@ main (int argc, char ** argv)
   TBoolean asc = TRUE, filter = FALSE;
   TArray *filter_result;
   Persona *p_cmp;
+  clock_t start, delta;
 
   priority_cmp_funcs = t_array_new ();
   criterias = t_array_new ();
@@ -116,20 +126,24 @@ main (int argc, char ** argv)
       case 'a':
         break;
       case 'm':
-        if (asc)
+        if (asc) {
+	  start = clock ();
           t_array_merge_sort_with_data (people, people_cmp_with_priority,
-              priority_cmp_funcs);
-        else
+              priority_cmp_funcs);	  
+	} else
           t_array_merge_sort_with_data (people, people_cmp_with_priority_rev,
               priority_cmp_funcs);
+	delta = clock () - start;
         break;
       case 'i':
+	start = clock ();
         if (asc)
           t_array_insertion_sort_with_data (people, people_cmp_with_priority,
               priority_cmp_funcs);
         else
           t_array_insertion_sort_with_data (people,
               people_cmp_with_priority_rev, priority_cmp_funcs);
+	delta = clock () - start;
         break;
       case 's': /* filter */
       {
@@ -190,10 +204,12 @@ main (int argc, char ** argv)
   if (!filter)
     t_array_foreach (people, persona_beautiful_print, NULL);
   else {
+    start = clock ();
     t_array_merge_sort_with_data (people, people_cmp_with_priority,
         priority_cmp_funcs);
     filter_result = t_array_filter_with_data (people, p_cmp, persona_cmp_binary,
         criterias);
+    delta = clock () - start;
     t_array_foreach (filter_result, persona_beautiful_print, NULL);
 
     t_array_set_free_func (filter_result, persona_free);
@@ -203,6 +219,7 @@ main (int argc, char ** argv)
   t_array_set_free_func (people, persona_free);
   t_array_free (people, NULL);
 
+  _print_time (delta);
   return TRUE;
 
 error_no_args:
