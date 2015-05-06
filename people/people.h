@@ -36,5 +36,6 @@ void persona_beautiful_print (tpointer persona, tpointer user_data);
 TArray * people_from_file (const char * filepath, const char * delimiter);
 int people_cmp_with_priority_rev (tpointer a, tpointer b,
     tpointer ptr_cmp_funcs);
+void persona_ugly_print (tpointer persona, tpointer user_data);
 
 #endif

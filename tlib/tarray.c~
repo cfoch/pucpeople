@@ -85,10 +85,13 @@ t_array_filter_with_data (TArray * array, tpointer target,
 			end_index = mid - 1;
 	}
 
+  printf ("LLLLLLLLL\n");
 	if (found) {
 		int i = mid - 1, j = mid + 1;
 
+    printf ("mid: %d\n", mid);
 		t_array_append (ret, elem);
+    printf ("agregando la mitad\n");
 		elem = t_array_index (array, i);
 		while ((i >= 0) && (cmp_func (elem, target, user_data) == 0)){
 			t_array_append (ret, elem);

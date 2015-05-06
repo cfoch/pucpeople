@@ -70,6 +70,43 @@ persona_eq (tpointer pers1, tpointer target, tpointer crits)
 }
 
 int
+persona_cmp_binary (tpointer pers1, tpointer target, tpointer crits)
+{
+  Persona *p1, *p2;
+  TArray * criterias;
+  int i;
+  int ret = 0;
+
+  p1 = PERSONA (pers1);
+  p2 = PERSONA (target);
+  criterias = (TArray *) crits;
+
+  for (i = 0; i < t_array_length (criterias) && (ret == 0); i++) {
+    switch (TPOINTER_TO_INT (t_array_index (criterias, i))) {
+      case PERSONA_FIRST_NAME:
+        ret = strcmp (p2->first_name, p1->first_name);
+        break;
+      case PERSONA_FATHER_LAST_NAME:
+        ret = strcmp (p2->father_last_name, p1->father_last_name);
+        break;
+      case PERSONA_MOTHER_LAST_NAME:
+        ret = strcmp (p2->mother_last_name, p1->mother_last_name);
+        break;
+      case PERSONA_YEAR: {
+        //printf ("comparando year: %d vs %d\n", p2->year, p1->year);
+        ret =  p2->year - p1->year;
+        break;
+      }
+      case PERSONA_CITY:
+        ret = strcmp (p2->city, p1->city);
+        break;
+    }
+  }
+
+  return ret;
+}
+
+int
 people_cmp_with_priority (tpointer a, tpointer b, tpointer ptr_cmp_funcs)
 {
   int i;
@@ -131,6 +168,18 @@ persona_beautiful_print (tpointer persona, tpointer user_data)
   printf ("%s\n", PERSONA (persona)->mother_last_name);
   printf ("%d\n", PERSONA (persona)->year);
   printf ("%s\n", PERSONA (persona)->city);
+  printf ("\n");
+}
+
+void
+persona_ugly_print (tpointer persona, tpointer user_data)
+{
+  printf ("%s,%s,%s,%d,%s",
+      PERSONA (persona)->first_name,
+      PERSONA (persona)->father_last_name,
+      PERSONA (persona)->mother_last_name,
+      PERSONA (persona)->year,
+      PERSONA (persona)->city);
   printf ("\n");
 }
 
