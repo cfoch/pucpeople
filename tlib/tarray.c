@@ -18,6 +18,12 @@ t_array_new ()
 }
 
 void
+t_array_set_free_func (TArray * array, TFunc free_func)
+{
+  array->free_func = free_func;
+}
+
+void
 t_array_foreach (TArray * array, TFunc func, tpointer user_data)
 {
   int i;
@@ -31,6 +37,12 @@ t_array_append (TArray * array, tpointer data)
   array->len++;
   array->vector = realloc (array->vector, sizeof (tpointer) * array->len);
   array->vector[array->len - 1] = data;  
+}
+
+void
+t_array_free (TArray * array, tpointer user_data)
+{
+  t_array_foreach (array, array->free_func, user_data);
 }
 
 tpointer

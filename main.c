@@ -195,7 +195,13 @@ main (int argc, char ** argv)
     filter_result = t_array_filter_with_data (people, p_cmp, persona_cmp_binary,
         criterias);
     t_array_foreach (filter_result, persona_beautiful_print, NULL);
+
+    t_array_set_free_func (filter_result, persona_free);
+    t_array_free (filter_result, NULL);
   }
+  
+  t_array_set_free_func (people, persona_free);
+  t_array_free (people, NULL);
 
   return TRUE;
 

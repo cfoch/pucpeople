@@ -6,7 +6,7 @@ struct _TArray
 {
   tpointer *vector;
   int len;
-  /* TFunc *free_func; */
+  TFunc free_func;
 };
 
 typedef struct _TArray TArray;
@@ -27,5 +27,7 @@ TArray * t_array_filter2_with_data (TArray * array, tpointer target,
 TArray * t_array_filter_with_data (TArray * array, tpointer target,
     TCompDataFunc cmp_func, tpointer user_data);
 int persona_cmp_binary (tpointer pers1, tpointer target, tpointer crits);
+void t_array_set_free_func (TArray * array, TFunc free_func);
+void t_array_free (TArray * array, tpointer user_data);
 
 #endif /* __T_ARRAY_H__ */

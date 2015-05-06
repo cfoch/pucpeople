@@ -183,6 +183,11 @@ persona_ugly_print (tpointer persona, tpointer user_data)
   printf ("\n");
 }
 
+void
+persona_free (tpointer p, tpointer user_data)
+{
+  return;
+}
 
 TArray *
 people_from_file (const char * filepath, const char * delimiter)
