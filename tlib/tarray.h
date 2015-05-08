@@ -29,5 +29,10 @@ TArray * t_array_filter_with_data (TArray * array, tpointer target,
 int persona_cmp_binary (tpointer pers1, tpointer target, tpointer crits);
 void t_array_set_free_func (TArray * array, TFunc free_func);
 void t_array_free (TArray * array, tpointer user_data);
+void t_array_insert_sorted (TArray * array, tpointer element,
+    TCompDataFunc cmp_func, tpointer user_data);
+void t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
+    tpointer cmp_data);
+void t_array_remove_last (TArray * array);
 
 #endif /* __T_ARRAY_H__ */
