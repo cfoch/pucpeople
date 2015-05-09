@@ -84,21 +84,21 @@ persona_cmp_binary (tpointer pers1, tpointer target, tpointer crits)
   for (i = 0; i < t_array_length (criterias) && (ret == 0); i++) {
     switch (TPOINTER_TO_INT (t_array_index (criterias, i))) {
       case PERSONA_FIRST_NAME:
-        ret = strcmp (p2->first_name, p1->first_name);
+        ret = strcmp (p1->first_name, p2->first_name);
         break;
       case PERSONA_FATHER_LAST_NAME:
-        ret = strcmp (p2->father_last_name, p1->father_last_name);
+        ret = strcmp (p1->father_last_name, p2->father_last_name);
         break;
       case PERSONA_MOTHER_LAST_NAME:
-        ret = strcmp (p2->mother_last_name, p1->mother_last_name);
+        ret = strcmp (p1->mother_last_name, p2->mother_last_name);
         break;
       case PERSONA_YEAR: {
         //printf ("comparando year: %d vs %d\n", p2->year, p1->year);
-        ret =  p2->year - p1->year;
+        ret =  p1->year - p2->year;
         break;
       }
       case PERSONA_CITY:
-        ret = strcmp (p2->city, p1->city);
+        ret = strcmp (p1->city, p2->city);
         break;
     }
   }

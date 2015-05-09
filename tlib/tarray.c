@@ -64,20 +64,24 @@ t_array_remove_last (TArray * array)
   array->vector = realloc (array, sizeof (tpointer) * array->len);
 }
 
-static int
-_array_binary_lookup_index_with_data (TArray * array, tpointer target,
+/* t_array_binary_lookup_index_with_data
+ * Lookup for the index of a given target element using binary search.
+ */
+int
+t_array_binary_lookup_index_with_data (TArray * array, tpointer target,
     TCompDataFunc cmp_func, tpointer user_data, TBoolean * found)
 {
   int start_index = 0, end_index = t_array_length (array) - 1, mid;
   *found = FALSE;
 
-  while ((start_index <= end_index) && (!*found)) {
+  mid = 0;
+  while ((start_index <= end_index) && (!(*found))) {
     tpointer elem;
     mid = (start_index + end_index) / 2;
     elem = t_array_index (array, mid);
     if (cmp_func (elem, target, user_data) == 0)
       *found = TRUE;
-    else if (cmp_func (elem, target, user_data) > 0)
+    else if (cmp_func (elem, target, user_data) < 0)
       start_index = mid + 1;
     else
       end_index = mid - 1;
@@ -119,7 +123,7 @@ t_array_filter_with_data (TArray * array, tpointer target,
   int mid;
   TBoolean found;
 
-  mid = _array_binary_lookup_index_with_data (array, target, cmp_func,
+  mid = t_array_binary_lookup_index_with_data (array, target, cmp_func,
       user_data, &found);
 
   if (found) {
@@ -291,21 +295,32 @@ _calc_minrun(int n){
 }
 
 
-
+/*
+ * t_array_insert_sorted
+ * Insert elements to an array keeping them sorted.
+ */
 void
-t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func, tpointer user_data)
+t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func,
+    tpointer user_data)
 {
   int i, pos;
   TBoolean found;
+  int cmp;
 
-  pos = _array_binary_lookup_index_with_data (array, element, cmp_func,
+  pos = t_array_binary_lookup_index_with_data (array, element, cmp_func,
       user_data, &found);
 
-  /* hack */
   t_array_append (array, NULL);
 
-  for (i = pos; i < array->len; i++)
-    array->vector[array->len - (1 + i - pos)] = array->vector[i];
+  if (array->len > 1) {
+    cmp = cmp_func (t_array_index (array, pos), element, user_data);
+
+    if (cmp < 0)
+      pos++;
+    for (i = array->len - 1; i >= pos + 1; i--)
+      array->vector[i] = array->vector[i - 1];
+  }
+
   array->vector[pos] = element;
 }
 
@@ -449,6 +464,7 @@ t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
         t_array_remove_last (runs);
         t_array_remove_last (runs);
 				*/
+        free (runs);
 				runs = t_array_new (); /*clean*/
         merged = _timsort_merge (run_y, smaller, cmp_func, cmp_data);
         t_array_append(runs, merged);
@@ -460,6 +476,7 @@ t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
         t_array_remove_last (runs);
         t_array_remove_last (runs);
 				*/
+        free (runs);
 				runs = t_array_new (); /*clean*/
 				t_array_append(runs, merged);
         t_array_append(runs, run_z);

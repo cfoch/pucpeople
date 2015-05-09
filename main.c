@@ -35,6 +35,11 @@ display_help ()
     "Sort data using insertion sort"
     "\n"
 
+    "\t--tim-sort (-t)"
+    "\t\t\t\t"
+    "Sort data using insertion sort"
+    "\n"
+
     "\t--desc (-d)"
     "\n"
 
@@ -74,6 +79,7 @@ main (int argc, char ** argv)
       {"desc", no_argument, NULL, 'd'},
       {"asc", no_argument, NULL, 'a'},
       {"merge-sort", no_argument, NULL, 'm'},
+      {"tim-sort", no_argument, NULL, 't'},
       {"insertion-sort", no_argument, NULL, 'i'},
       {"priority", required_argument, NULL, 'p'},
       {"filter", no_argument, NULL, 's'},
@@ -85,7 +91,7 @@ main (int argc, char ** argv)
       {NULL, 0, NULL, 0}
     };
     int option_index = 0, c;
-    c = getopt_long (argc, argv, "f:hadmip:sn:v:w:y:c:", long_options, &option_index);
+    c = getopt_long (argc, argv, "f:hadmtip:sn:v:w:y:c:", long_options, &option_index);
     if (c == -1)
       break;
 
@@ -127,31 +133,39 @@ main (int argc, char ** argv)
         break;
       case 'm':
         if (asc) {
-	  start = clock ();
+	        start = clock ();
           t_array_merge_sort_with_data (people, people_cmp_with_priority,
               priority_cmp_funcs);	  
-	} else
+	      } else
           t_array_merge_sort_with_data (people, people_cmp_with_priority_rev,
               priority_cmp_funcs);
-	delta = clock () - start;
+	        delta = clock () - start;
+        break;
+      case 't':
+        if (asc) {
+	        start = clock ();
+          t_array_tim_sort_with_data (people, people_cmp_with_priority,
+              priority_cmp_funcs);
+	      } else
+          t_array_tim_sort_with_data (people, people_cmp_with_priority_rev,
+              priority_cmp_funcs);
+	      delta = clock () - start;
         break;
       case 'i':
-	start = clock ();
+	      start = clock ();
         if (asc)
           t_array_insertion_sort_with_data (people, people_cmp_with_priority,
               priority_cmp_funcs);
         else
           t_array_insertion_sort_with_data (people,
               people_cmp_with_priority_rev, priority_cmp_funcs);
-	delta = clock () - start;
+	      delta = clock () - start;
         break;
       case 's': /* filter */
-      {
         p_cmp = malloc (sizeof (Persona));
         priority_cmp_funcs = t_array_new ();
         filter = TRUE;
         break;
-      }
       case 'n': /* first-name */
         if (!filter)
           goto error_no_args;

@@ -34,5 +34,8 @@ void t_array_insert_sorted (TArray * array, tpointer element,
 void t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
     tpointer cmp_data);
 void t_array_remove_last (TArray * array);
+void t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func, tpointer user_data);
+int t_array_binary_lookup_index_with_data (TArray * array, tpointer element,
+    TCompDataFunc cmp_func, tpointer user_data, TBoolean * found);
 
 #endif /* __T_ARRAY_H__ */
