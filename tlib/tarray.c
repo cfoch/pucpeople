@@ -64,6 +64,31 @@ t_array_remove_last (TArray * array)
   array->vector = realloc (array, sizeof (tpointer) * array->len);
 }
 
+static int
+_array_binary_lookup_index_with_data (TArray * array, tpointer target,
+    TCompDataFunc cmp_func, tpointer user_data, TBoolean * found)
+{
+  int start_index = 0, end_index = t_array_length (array) - 1, mid;
+  *found = FALSE;
+
+  while ((start_index <= end_index) && (!*found)) {
+    tpointer elem;
+    mid = (start_index + end_index) / 2;
+    elem = t_array_index (array, mid);
+    if (cmp_func (elem, target, user_data) == 0)
+      *found = TRUE;
+    else if (cmp_func (elem, target, user_data) > 0)
+      start_index = mid + 1;
+    else
+      end_index = mid - 1;
+  }
+  return mid;
+}
+
+/*
+ * t_array_filter2_with_data
+ * Filter a given target element for non-ordered arrays.
+ */
 TArray *
 t_array_filter2_with_data (TArray * array, tpointer target, TEqDataFunc eq_func,
     tpointer user_data)
@@ -81,49 +106,43 @@ t_array_filter2_with_data (TArray * array, tpointer target, TEqDataFunc eq_func,
   return ret;
 }
 
+/*
+ * t_array_filter_with_data
+ * Filter a given target element for ordered arrays using binary search method.
+ */
 TArray *
 t_array_filter_with_data (TArray * array, tpointer target,
     TCompDataFunc cmp_func, tpointer user_data)
 {
-    TArray *ret;
-    int start_index = 0, end_index = t_array_length (array) - 1, mid;
+  TArray *ret = t_array_new ();
   tpointer elem;
+  int mid;
+  TBoolean found;
 
-    ret = t_array_new ();
-    TBoolean found = FALSE;
+  mid = _array_binary_lookup_index_with_data (array, target, cmp_func,
+      user_data, &found);
 
-    while ((start_index <= end_index) && (!found)) {
-        mid = (start_index + end_index) / 2;
-    elem = t_array_index (array, mid);
+  if (found) {
+    int i = mid - 1, j = mid + 1;
 
-        if (cmp_func (elem, target, user_data) == 0)
-            found = TRUE;
-        else if (cmp_func (elem, target, user_data) > 0)
-            start_index = mid + 1;
-        else
-            end_index = mid - 1;
-    }
-
-    if (found) {
-        int i = mid - 1, j = mid + 1;
-
-        t_array_append (ret, elem);
-        elem = t_array_index (array, i);
-        while ((i >= 0) && (cmp_func (elem, target, user_data) == 0)){
-            t_array_append (ret, elem);
+    elem = array->vector[mid];
+    t_array_append (ret, elem);
+    elem = t_array_index (array, i);
+    while ((i >= 0) && (cmp_func (elem, target, user_data) == 0)){
+      t_array_append (ret, elem);
       i--;
-            elem = t_array_index (array, i);
-        }
-
-        elem = t_array_index (array, j);
-        while ((j <= t_array_length (array) - 1) &&
-        (cmp_func (elem, target, user_data) == 0)){
-            t_array_append (ret, elem);
-      j++;
-            elem = t_array_index (array, j);
-        }
+      elem = t_array_index (array, i);
     }
-    return ret;
+
+    elem = t_array_index (array, j);
+    while ((j <= t_array_length (array) - 1) && 
+        (cmp_func (elem, target, user_data) == 0)){
+      t_array_append (ret, elem);
+      j++;
+      elem = t_array_index (array, j);
+    }
+  }
+  return ret;
 }
 
 
@@ -276,12 +295,18 @@ _calc_minrun(int n){
 void
 t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func, tpointer user_data)
 {
-  /* FIXME
-   * Use the right algorithm. This code sucks, but it is useful to
-   * test the timsort quickly.
-   */
-   t_array_append (array, element);
-   t_array_insertion_sort_with_data (array, cmp_func, user_data);
+  int i, pos;
+  TBoolean found;
+
+  pos = _array_binary_lookup_index_with_data (array, element, cmp_func,
+      user_data, &found);
+
+  /* hack */
+  t_array_append (array, NULL);
+
+  for (i = pos; i < array->len; i++)
+    array->vector[array->len - (1 + i - pos)] = array->vector[i];
+  array->vector[pos] = element;
 }
 
 static TArray *
