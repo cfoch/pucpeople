@@ -85,45 +85,45 @@ TArray *
 t_array_filter_with_data (TArray * array, tpointer target,
     TCompDataFunc cmp_func, tpointer user_data)
 {
-	TArray *ret;
-	int start_index = 0, end_index = t_array_length (array) - 1, mid;
+    TArray *ret;
+    int start_index = 0, end_index = t_array_length (array) - 1, mid;
   tpointer elem;
 
-	ret = t_array_new ();
-	TBoolean found = FALSE;
+    ret = t_array_new ();
+    TBoolean found = FALSE;
 
-	while ((start_index <= end_index) && (!found)) {
-		mid = (start_index + end_index) / 2;
+    while ((start_index <= end_index) && (!found)) {
+        mid = (start_index + end_index) / 2;
     elem = t_array_index (array, mid);
 
-		if (cmp_func (elem, target, user_data) == 0)
-			found = TRUE;
-		else if (cmp_func (elem, target, user_data) > 0)
-			start_index = mid + 1;
-		else
-			end_index = mid - 1;
-	}
+        if (cmp_func (elem, target, user_data) == 0)
+            found = TRUE;
+        else if (cmp_func (elem, target, user_data) > 0)
+            start_index = mid + 1;
+        else
+            end_index = mid - 1;
+    }
 
-	if (found) {
-		int i = mid - 1, j = mid + 1;
+    if (found) {
+        int i = mid - 1, j = mid + 1;
 
-		t_array_append (ret, elem);
-		elem = t_array_index (array, i);
-		while ((i >= 0) && (cmp_func (elem, target, user_data) == 0)){
-			t_array_append (ret, elem);
+        t_array_append (ret, elem);
+        elem = t_array_index (array, i);
+        while ((i >= 0) && (cmp_func (elem, target, user_data) == 0)){
+            t_array_append (ret, elem);
       i--;
-			elem = t_array_index (array, i);
-		}
+            elem = t_array_index (array, i);
+        }
 
-		elem = t_array_index (array, j);
-		while ((j <= t_array_length (array) - 1) &&
+        elem = t_array_index (array, j);
+        while ((j <= t_array_length (array) - 1) &&
         (cmp_func (elem, target, user_data) == 0)){
-			t_array_append (ret, elem);
+            t_array_append (ret, elem);
       j++;
-			elem = t_array_index (array, j);
-		}
-	}
-	return ret;
+            elem = t_array_index (array, j);
+        }
+    }
+    return ret;
 }
 
 
@@ -272,16 +272,9 @@ _calc_minrun(int n){
 }
 
 
-static void
-print (tpointer data, tpointer user_data)
-{
-  printf ("%d ", TPOINTER_TO_INT (data));
-}
-
 
 void
-t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func,
-    tpointer user_data)
+t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func, tpointer user_data)
 {
   /* FIXME
    * Use the right algorithm. This code sucks, but it is useful to
@@ -292,56 +285,70 @@ t_array_insert_sorted (TArray * array, tpointer element, TCompDataFunc cmp_func,
 }
 
 static TArray *
-_buscar_run_with_data (TArray *array, int * i, int minrun,
+_get_run_with_data (TArray *array, int * i, int minrun,
     TCompDataFunc cmp_func, tpointer cmp_data)
 {
   TArray *run;
   run = t_array_new ();
-  printf ("Generando run\n");
+  
   /*el ultimo elemento*/
-  if (*i >= array->len - 1){
-    t_array_append (run,array->vector[*i]);
+  if (*i == array->len- 1){
+    t_array_append (run, array->vector[*i]);
+		(*i)++;
     return run;
   }
     
   
   /*swap first and second*/
-  if (cmp_func (array->vector[*i], array->vector[*i + 1], cmp_data) < 0)
-    t_swap (array->vector[*i], array->vector[*i + 1]);
+  if (cmp_func (array->vector[*i], array->vector[*i + 1], cmp_data) > 0){
+		t_array_append (run, array->vector[*i + 1]);		
+		t_array_append (run, array->vector[*i]);
+	} else {
+	  t_array_append (run, array->vector[*i]);
+  	t_array_append (run, array->vector[*i + 1]);
+	}
+  (*i)++;         
   
-  /*add first & second*/
-  t_array_append (run, array->vector[*i]);
-  t_array_append (run, array->vector[*i + 1]);
-  run->len = 2;
-  (*i)++;        
-  
+	if (*i == array->len - 1){
+			(*i)++;
+			return run;
+	}
   /*add*/
-  while ((*i < array->len - 1) && (cmp_func(array->vector[*i],
-      array->vector[*i + 1], cmp_data)>0)) {
-    run->len++;
+  while (cmp_func(run->vector[run->len - 1],
+			array->vector[*i + 1], cmp_data)<=0) {
     t_array_append (run, array->vector[*i + 1]);
     (*i)++;
+		if (*i == array->len - 1){
+			(*i)++;
+			return run;
+		}
   }
+	if (run->len >= minrun){
+		(*i)++;
+		return run;
+	}
 
   while ((*i < array->len - 1) && (run->len < minrun)) {
-    t_array_insert_sorted(run, array->vector[*i + 1], cmp_func,
-        cmp_data);
+    t_array_insert_sorted (run, array->vector[*i + 1], cmp_func, cmp_data);
     (*i)++;
+		if (*i == array->len - 1){
+			(*i)++;
+			return run;
+		}
   }
 
-
-  
   /*add*/
-  while ((*i < array->len - 1) && (run->len >= minrun) &&
-      (array->vector[*i+1] >= array->vector[*i])) {
-    run->len++;
+  while ((run->len >= minrun) && (cmp_func (run->vector[run->len - 1], 
+			array->vector[*i + 1], cmp_data) <= 0)){
+		
     t_array_append (run, array->vector[*i + 1]);
     (*i)++;
+		if (*i == array->len - 1){
+			(*i)++;
+			return run;
+		}
   }
-  t_array_foreach (run, print, NULL);
-  printf ("\n");
-  printf ("i: %d\n", *i);
-  printf (":p\n");
+	(*i)++;
   return run;
 }
 
@@ -362,19 +369,15 @@ _timsort_merge (TArray * a, TArray * b,TCompDataFunc cmp_func, tpointer cmp_data
       t_array_append(result ,b->vector[j++]);
     else
       t_array_append(result ,a->vector[i++]);
-    result->len++;
 
   if (i >= first_end)
-    for (k = j; k < second_end; k++){
+    for (k = j; k < second_end; k++)
       t_array_append(result ,b->vector[k]);
-      result->len++;
-    }
 
   if (j >= second_end)
-    for (k = i; k < first_end ; k++){
+    for (k = i; k < first_end ; k++)
       t_array_append(result ,a->vector[k]);
-      result->len++;
-    }
+
   return result;
 }
 
@@ -383,7 +386,7 @@ t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
     tpointer cmp_data)
 {
   TArray *run_x, *run_y, *run_z;
-  TArray *runs;
+	TArray *runs;
   int i = 0; /* indice para el array*/
   int minrun;
   
@@ -392,22 +395,23 @@ t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
     return;
   }
 
-  minrun = _calc_minrun(array->len); /*Definido abajo*/
+  minrun = _calc_minrun(array->len); /*Definido */
 
-  runs = t_array_new ();
   
+  runs = t_array_new ();
+  TArray *run;
+
   while (i < array->len) {
-    TArray *run;
-    printf ("HOLA\n");
-    run = _buscar_run_with_data (array, &i, minrun, cmp_func, cmp_data);
+		TArray *merged;
+    run = _get_run_with_data (array, &i, minrun, cmp_func, cmp_data);
     t_array_append (runs, run);
     if (runs->len >= 3) {
-      run_x = t_array_index (runs, 0); /*primero*/
+      run_x = t_array_index (runs, 2); /*primero*/
       run_y = t_array_index (runs, 1); /*segundo*/
-      run_z = t_array_index (runs, 2); /*tercero*/
+      run_z = t_array_index (runs, 0); /*tercero*/
       if (!(run_x->len > run_y->len + run_z->len && run_y->len > run_z->len)) {
-        TArray *smaller, *larger, *merged;
-        
+        TArray *smaller, *larger;
+    
         if (run_x->len < run_z->len) {
             smaller = run_x;
             larger = run_z;
@@ -415,30 +419,30 @@ t_array_tim_sort_with_data (TArray * array, TCompDataFunc cmp_func,
             smaller = run_z;
             larger = run_x;
         }
+				/*Remove all
+				t_array_remove_last (runs);
         t_array_remove_last (runs);
         t_array_remove_last (runs);
-        t_array_remove_last (runs);
-
+				*/
+				runs = t_array_new (); /*clean*/
         merged = _timsort_merge (run_y, smaller, cmp_func, cmp_data);
         t_array_append(runs, merged);
         t_array_append(runs, larger);
-      }  else {
-        TArray *merged;
-        merged = _timsort_merge (run_x, run_y, cmp_func, cmp_data);
+      } else {
+				merged = _timsort_merge (run_x, run_y, cmp_func, cmp_data);
+				/*Remove all
+				t_array_remove_last (runs);
         t_array_remove_last (runs);
         t_array_remove_last (runs);
-        t_array_remove_last (runs);
-        t_array_append(runs, merged);
+				*/
+				runs = t_array_new (); /*clean*/
+				t_array_append(runs, merged);
         t_array_append(runs, run_z);
-      }
+			}		
     }
   }
-
-  printf (":)\n");
-
-  t_array_remove_last (runs);
-  t_array_remove_last (runs);
-  run_x = t_array_index (runs, 0); /*primero*/
-  run_y = t_array_index (runs, 1); /*segundo*/
+  run_x = t_array_index (runs, 1); /*primero*/
+  run_y = t_array_index (runs, 0); /*segundo*/
   array->vector = _timsort_merge(run_x, run_y, cmp_func, cmp_data)->vector; /*mezcla final*/
 }
+
